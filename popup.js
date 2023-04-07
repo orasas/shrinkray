@@ -19,22 +19,23 @@ document.getElementById('resize').addEventListener('click', async function () {
     document.getElementById('loading').classList.remove('hidden');
     document.getElementById('resize').disabled = true;
 
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    const tabId = tab.id;
+    try {
+      const resizedImageDataUrl = await Promise.race([
+        resizeImage(fileURL, width, height),
+        timeout(15000)
+      ]);
 
-    const resizedImageDataUrl = await chrome.scripting.executeScript({
-      target: { tabId: tabId },
-      func: resizeImage,
-      args: [fileURL, width, height]
-    });
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('resize').disabled = false;
 
-    document.getElementById('loading').classList.add('hidden');
-    document.getElementById('resize').disabled = false;
-
-    document.getElementById('dimensions').style.display = 'none';
-    document.getElementById('result').classList.remove('hidden');
-    document.getElementById('download').href = resizedImageDataUrl[0].result;
-
+      document.getElementById('dimensions').style.display = 'none';
+      document.getElementById('result').classList.remove('hidden');
+      document.getElementById('download').href = resizedImageDataUrl;
+    } catch (error) {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('resize').disabled = false;
+      alert('Image resizing took too long. Please try again with a smaller image or smaller dimensions.');
+    }
   } else {
     alert('Please upload an image and enter valid width and height values.');
   }
@@ -61,9 +62,16 @@ async function resizeImage(fileURL, width, height) {
     var img = new Image();
     img.src = fileURL;
     img.onload = function () {
-      if (img.src.endsWith('.jpg') || img.src.endsWith('.jpeg') || img.src.endsWith('.png')) {
+      const fileFormat = fileURL.split('.').pop().toLowerCase();
+      if (fileFormat === 'jpg' || fileFormat === 'jpeg' || fileFormat === 'png') {
         resolve(resize(img, width, height));
       }
     };
   });
+}
+
+function timeout(ms) {
+  return new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('Timeout')), ms)
+  );
 }
