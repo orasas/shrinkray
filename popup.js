@@ -21,7 +21,7 @@ document.getElementById('resize').addEventListener('click', async function () {
 
     try {
       const resizedImageDataUrl = await Promise.race([
-        resizeImage(fileURL, width, height),
+        resizeImage(file, width, height),
         timeout(15000)
       ]);
 
@@ -48,26 +48,16 @@ document.getElementById('newImage').addEventListener('click', function () {
   document.getElementById('height').value = '';
 });
 
-async function resizeImage(fileURL, width, height) {
-  function resize(img, customWidth, customHeight) {
-    var canvas = document.createElement('canvas');
-    canvas.width = customWidth;
-    canvas.height = customHeight;
-    var ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0, customWidth, customHeight);
-    return canvas.toDataURL();
-  }
-
-  return new Promise((resolve) => {
-    var img = new Image();
-    img.src = fileURL;
-    img.onload = function () {
-      const fileFormat = fileURL.split('.').pop().toLowerCase();
-      if (fileFormat === 'jpg' || fileFormat === 'jpeg' || fileFormat === 'png') {
-        resolve(resize(img, width, height));
-      }
-    };
-  });
+async function resizeImage(file, width, height) {
+  const fileURL = URL.createObjectURL(file);
+  const img = await createImageBitmap(file);
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = width;
+  canvas.height = height;
+  ctx.drawImage(img, 0, 0, width, height);
+  const resizedImageDataUrl = canvas.toDataURL(file.type);
+  return resizedImageDataUrl;
 }
 
 function timeout(ms) {

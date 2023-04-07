@@ -6,23 +6,27 @@
   </head>
   <body>
     <div class="hero">
-      <img src="hero.png" alt="Hero Image" />
       <h1>Shrink Ray</h1>
     </div>
     <input type="file" id="fileInput" accept=".jpg,.jpeg,.png" />
     <div id="dimensions" class="hidden">
       <label for="width">Width:</label>
-      <input type="number" id="width" min="1" />
+      <input type="number" id="width" min="1" step="1" />
       <label for="height">Height:</label>
-      <input type="number" id="height" min="1" />
+      <input type="number" id="height" min="1" step="1" />
       <button id="resize">Resize Image</button>
-      <div id="loading" class="spinner hidden"></div>
+      <div id="loading" class="hidden">
+        <div class="spinner"></div>
+      </div>
     </div>
     <div id="result" class="hidden">
-      <h2>Download Resized Image</h2>
-      <a id="download" download="resized_image.png">Download</a>
-      <button id="newImage">Resize Another Image</button>
+      <h2>Resized Image</h2>
+      <div class="button-wrapper">
+        <a id="download" download="resized-image.png">Download Image</a>
+        <button id="newImage">Resize Another Image</button>
+      </div>
     </div>
     <script src="popup.js"></script>
   </body>
 </html>
+
