@@ -6,13 +6,10 @@
   "icons": {
     "48": "shrinkray48.png"
   },
-  "action": {
-    "default_icon": "icon.png",
-    "default_popup": "popup.html"
-  },
   "permissions": [
-    "activeTab",
-    "scripting"
+    "fileSystemProvider",
+    "storage",
+    "declarativeContent"
   ],
   "content_scripts": [
     {
